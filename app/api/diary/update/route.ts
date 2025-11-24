@@ -1,15 +1,15 @@
 // /api/diary/update/route.ts
 
+import { type Diary, DiaryState } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prismaClient";
 import z from "zod";
-import { Diary, DiaryState } from "@prisma/client";
+import { prisma } from "@/lib/prismaClient";
 
 const UpdateDiarySchema = z.object({
 	workflowId: z.string(),
 	imageUrl: z.string().optional(),
 	hasImage: z.boolean().optional(),
-	state: z.enum(DiaryState).optional(),
+	state: z.nativeEnum(DiaryState).optional(),
 	content: z.string().optional(),
 });
 
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
 		return NextResponse.json({
 			status: "ok",
-			diary: updatedDiary,
+			updated: updatedDiary,
 		});
 	} catch (err) {
 		console.error("Diary update API error:", err);

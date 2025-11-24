@@ -1,8 +1,8 @@
 // /api/diary/revise/route.ts
 
-import z from "zod";
-import { userEditedHook } from "../../../../workflows/hook";
 import { NextResponse } from "next/server";
+import z from "zod";
+import { userEditedHookClient } from "../../../../workflows/hook-client";
 
 const RevisePostBodySchema = z.object({
 	workflowId: z.string(),
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 	}
 	const body = parseResult.data;
 	const { workflowId, revisedBullets } = body;
-	await userEditedHook.resume(workflowId, {
+	await userEditedHookClient.resume(workflowId, {
 		revisedBullets,
 	});
 

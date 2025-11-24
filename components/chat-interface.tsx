@@ -1,10 +1,10 @@
 "use client";
 
+import { Send, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Sparkles } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 export function ChatInterface() {
 	const [message, setMessage] = useState("");
@@ -42,7 +42,7 @@ export function ChatInterface() {
 				<div className="mx-auto max-w-3xl space-y-4">
 					{messages.map((msg, idx) => (
 						<div
-							key={idx}
+							key={`${msg.role}-${idx}-${msg.content.slice(0, 10)}`}
 							className={cn(
 								"flex gap-3",
 								msg.role === "user" ? "justify-end" : "justify-start",

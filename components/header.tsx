@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { UserMenu } from "./header/user-menu";
 
 export function Header() {
 	return (
@@ -15,12 +16,10 @@ export function Header() {
 					</div>
 				</Link>
 				<div className="flex items-center gap-3">
-					<Button variant="ghost" size="sm">
-						ログアウト
+					<UserMenu />
+					<Button asChild size="sm">
+						<Link href="/creation">作成</Link>
 					</Button>
-					<div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-sm font-medium text-secondary-foreground">
-						U
-					</div>
 				</div>
 			</div>
 		</header>

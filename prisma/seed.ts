@@ -1,4 +1,4 @@
-import { PrismaClient, DiaryState } from "@prisma/client";
+import { DiaryState, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 

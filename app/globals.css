@@ -78,3 +78,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .card {
+    @apply rounded-lg;
+  }
+
+  @media (max-width: 768px) {
+    .layout-stack {
+      @apply flex-col;
+    }
+    .hide-on-mobile {
+      @apply hidden;
+    }
+  }
+}

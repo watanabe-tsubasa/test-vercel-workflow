@@ -1,95 +1,132 @@
 "use client";
 
-import { useState } from "react";
+import type { DiaryState } from "@prisma/client";
+import { Check, ImageIcon, Loader2, PenLine } from "lucide-react";
+import Image from "next/image";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Check, ImageIcon, Loader2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
-export function CurrentDiaryContent() {
-	const [approved, setApproved] = useState(false);
-	const [generatingImage, setGeneratingImage] = useState(false);
-	const [imageGenerated, setImageGenerated] = useState(false);
+interface Props {
+	status: DiaryState | "IDLE" | "PENDING";
+	content: string;
+	imageUrl: string | null;
+	updatedAt?: string;
+	onRevise: (content: string) => void;
+}
 
-	const handleApprove = () => {
-		setApproved(true);
-		setGeneratingImage(true);
+export function CurrentDiaryContent({
+	status,
+	content,
+	imageUrl,
+	updatedAt,
+	onRevise,
+}: Props) {
+	const [draft, setDraft] = useState(content);
 
-		// モック画像生成
-		setTimeout(() => {
-			setGeneratingImage(false);
-			setImageGenerated(true);
-		}, 3000);
-	};
+	const stateLabel = useMemo(() => {
+		switch (status) {
+			case "GENERATING":
+				return "AIが下書きを生成中...";
+			case "WAITING_USER":
+				return "下書きができました。編集して送信してください。";
+			case "DRAWING":
+				return "画像生成中...";
+			case "COMPLETED":
+				return "完了";
+			case "PENDING":
+				return "準備中...";
+			default:
+				return "待機中";
+		}
+	}, [status]);
 
 	return (
-		<div className="mx-auto max-w-4xl space-y-6 h-full p-6 grid grid-cols-4 grid-rows-5">
-			{/* 画像エリア */}
-			<Card className="overflow-hidden col-span-2 col-start-2 row-span-2">
-				{!approved ? (
-					<div className="flex h-full items-center justify-center bg-muted">
-						<div className="text-center">
-							<ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-							<p className="mt-3 text-sm text-muted-foreground">
-								日記の文章を承認すると画像が生成されます
-							</p>
-						</div>
-					</div>
-				) : generatingImage ? (
-					<div className="flex h-full items-center justify-center bg-muted">
-						<div className="text-center">
-							<Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-							<p className="mt-3 text-sm text-muted-foreground">
-								画像を生成中...
-							</p>
-						</div>
-					</div>
-				) : imageGenerated ? (
-					<img
-						src="/peaceful-park-scene-with-coffee-shop-and-sunset.jpg"
-						alt="生成された絵日記の画像"
-						className="h-full w-full object-cover"
-					/>
-				) : null}
-			</Card>
+		<div className="mx-auto max-w-5xl space-y-6 h-full p-6">
+			<div className="flex items-center justify-between">
+				<div>
+					<p className="text-sm text-muted-foreground">進行状況</p>
+					<p className="text-lg font-semibold">{stateLabel}</p>
+				</div>
+				{updatedAt && (
+					<p className="text-xs text-muted-foreground">
+						更新: {new Date(updatedAt).toLocaleString("ja-JP")}
+					</p>
+				)}
+			</div>
 
-			{/* 日記の文章 */}
-			<Card className="p-6 col-span-5 row-span-3">
-				<div className="space-y-4 h-full flex flex-col">
-					<div className="flex items-center justify-between">
-						<h2 className="text-2xl font-bold text-foreground">今日の一日</h2>
-						<span className="text-sm text-muted-foreground">2024年1月15日</span>
-					</div>
-					<ScrollArea className="prose prose-sm max-w-none leading-relaxed text-foreground flex-1 overflow-auto">
-						<p>
-							今朝は気持ちの良い天気だったので、近所の公園を散歩することにした。
-							朝の澄んだ空気を吸いながら歩くと、心が落ち着いていくのを感じた。
-							公園では犬の散歩をしている人や、ジョギングをしている人たちとすれ違った。
-						</p>
-						<p>
-							散歩の後は、お気に入りのカフェに立ち寄った。
-							いつものコーヒーを注文すると、バリスタさんが笑顔で迎えてくれた。
-							窓際の席に座り、ゆっくりとコーヒーを味わう時間は、何にも代えがたい贅沢だ。
-						</p>
-						<p>
-							午後は久しぶりに友達と電話で話した。
-							最近の出来事や、お互いの近況を報告し合い、笑い合った。
-							離れていても、こうして繋がっていられることに感謝の気持ちでいっぱいになった。
-						</p>
-						<p>
-							夕方、ふと窓の外を見ると、空が美しいオレンジ色に染まっていた。
-							思わずベランダに出て、その景色をしばらく眺めていた。
-							こんな穏やかな一日を過ごせたことに、心から感謝している。
-						</p>
-					</ScrollArea>
-					{!approved && (
-						<div className="flex justify-end pt-4">
-							<Button onClick={handleApprove} size="lg">
-								<Check className="mr-2 h-4 w-4" />
-								この文章で画像を生成
-							</Button>
+			<Card className="overflow-hidden">
+				<div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+					<div className="space-y-4">
+						<div className="flex items-center justify-between">
+							<h2 className="text-xl font-bold text-foreground">文章</h2>
+							{status === "DRAWING" && (
+								<span className="flex items-center gap-2 text-sm text-muted-foreground">
+									<Loader2 className="h-4 w-4 animate-spin" />
+									画像生成中...
+								</span>
+							)}
+							{status === "COMPLETED" && (
+								<span className="flex items-center gap-2 text-sm text-emerald-600">
+									<Check className="h-4 w-4" />
+									完了
+								</span>
+							)}
 						</div>
-					)}
+						<Textarea
+							value={draft}
+							onChange={(e) => setDraft(e.target.value)}
+							className="min-h-[280px]"
+							placeholder="生成された文章がここに表示されます"
+							disabled={status === "COMPLETED" || status === "DRAWING"}
+						/>
+						{status === "WAITING_USER" && (
+							<div className="flex justify-end">
+								<Button onClick={() => onRevise(draft)} size="lg">
+									<PenLine className="mr-2 h-4 w-4" />
+									修正を送信
+								</Button>
+							</div>
+						)}
+					</div>
+
+					<div className="space-y-4">
+						<div className="flex items-center justify-between">
+							<h2 className="text-xl font-bold text-foreground">画像</h2>
+						</div>
+						<div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-muted">
+							{status === "DRAWING" && (
+								<div className="flex h-full items-center justify-center">
+									<div className="text-center">
+										<Loader2 className="mx-auto h-10 w-10 animate-spin text-primary" />
+										<p className="mt-2 text-sm text-muted-foreground">
+											画像を生成中...
+										</p>
+									</div>
+								</div>
+							)}
+							{status === "COMPLETED" && imageUrl && (
+								<Image
+									src={imageUrl}
+									alt="生成された絵日記"
+									className="h-full w-full object-cover"
+									fill
+									priority={false}
+								/>
+							)}
+							{status !== "COMPLETED" && status !== "DRAWING" && (
+								<div className="flex h-full items-center justify-center">
+									<div className="text-center">
+										<ImageIcon className="mx-auto h-10 w-10 text-muted-foreground" />
+										<p className="mt-2 text-sm text-muted-foreground">
+											文章を送信すると画像が生成されます
+										</p>
+									</div>
+								</div>
+							)}
+						</div>
+					</div>
 				</div>
 			</Card>
 		</div>

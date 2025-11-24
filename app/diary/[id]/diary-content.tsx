@@ -31,8 +31,8 @@ export async function DiaryContent({ diary }: { diary: Diary }) {
 						<span className="text-sm text-muted-foreground">{diary.date}</span>
 					</div>
 					<ScrollArea className="prose prose-sm max-w-none leading-relaxed text-foreground flex-1 overflow-auto">
-						{diary.content?.split("/\r?\n/").map((paragraph, i) => (
-							<p key={i}>{paragraph}</p>
+						{diary.content?.split(/\r?\n/).map((paragraph, idx) => (
+							<p key={`${idx}-${paragraph.slice(0, 20)}`}>{paragraph}</p>
 						))}
 					</ScrollArea>
 				</div>

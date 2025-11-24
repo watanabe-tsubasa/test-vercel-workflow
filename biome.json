@@ -6,7 +6,8 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"includes": ["**", "!!**/app/globals.css"],
+		"ignoreUnknown": true
 	},
 	"formatter": {
 		"enabled": true,

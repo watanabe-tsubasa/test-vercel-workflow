@@ -1,14 +1,14 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
 import { Calendar, ImageIcon } from "lucide-react";
-import { cn, demoId } from "@/lib/utils";
 import Link from "next/link";
 import { getDiaries } from "@/app/actions";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
-export async function DiarySidebar({ id }: { id?: string }) {
-	const diaries = await getDiaries(id || demoId);
+export async function DiarySidebar() {
+	const diaries = await getDiaries();
 	return (
-		<div className="flex h-full w-80 flex-col border-r border-border bg-sidebar">
+		<div className="flex h-full w-80 flex-col border-r border-border bg-sidebar hide-on-mobile">
 			<div className="border-b border-sidebar-border p-4">
 				<h2 className="text-lg font-semibold text-sidebar-foreground">
 					これまでの日記

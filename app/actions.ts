@@ -1,5 +1,6 @@
 "use server";
 
+import { requireCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prismaClient";
 
 // 汎用で使うserver action
@@ -11,9 +12,10 @@ type Diaries = Array<{
 	hasImage: boolean;
 }>;
 
-export async function getDiaries(userId: string): Promise<Diaries> {
+export async function getDiaries(): Promise<Diaries> {
+	const { id: currentUserId } = await requireCurrentUser();
 	const diaries = await prisma.diary.findMany({
-		where: { userId },
+		where: { userId: currentUserId },
 		select: { id: true, title: true, date: true, hasImage: true },
 		orderBy: { date: "desc" },
 	});

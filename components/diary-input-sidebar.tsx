@@ -1,16 +1,25 @@
 "use client";
 
+import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sparkles } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
-export function DiaryInputSidebar() {
+export function DiaryInputSidebar(props: {
+	onStart: (bullets: string) => void;
+	loading?: boolean;
+}) {
+	const { onStart, loading } = props;
 	const [bulletPoints, setBulletPoints] = useState(
 		"• 朝、近所の公園を散歩した\n• カフェで美味しいコーヒーを飲んだ\n• 友達と電話で話した\n• 夕方、きれいな夕焼けを見た",
 	);
+
+	const handleStart = () => {
+		if (loading) return;
+		onStart(bulletPoints);
+	};
 
 	return (
 		<div className="flex h-full w-80 flex-col border-r border-border bg-sidebar">
@@ -36,9 +45,14 @@ export function DiaryInputSidebar() {
 							placeholder="今日の出来事を箇条書きで..."
 						/>
 					</div>
-					<Button className="w-full" size="lg">
+					<Button
+						className="w-full"
+						size="lg"
+						onClick={handleStart}
+						disabled={loading}
+					>
 						<Sparkles className="mr-2 h-4 w-4" />
-						日記を生成
+						{loading ? "生成中..." : "日記を生成"}
 					</Button>
 				</div>
 			</ScrollArea>

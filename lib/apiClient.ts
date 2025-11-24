@@ -1,24 +1,21 @@
 // /lib/apiClient.ts
 
-import {
+import type {
 	CreateDiaryInput,
 	CreateDiaryResponse,
 } from "@/app/api/diary/create/route";
 
-import {
+import type {
 	ReviseDiaryInput,
 	ReviseDiaryResponse,
 } from "@/app/api/diary/revise/route";
 
-import {
+import type {
 	UpdateDiaryInput,
 	UpdateDiaryResponse,
 } from "@/app/api/diary/update/route";
 
-import {
-	StreamDiaryInput,
-	StreamDiaryResponse,
-} from "@/app/api/internal/ai/stream-start/route";
+import type { StreamDiaryInput } from "@/app/api/internal/ai/stream-start/route";
 
 // --------------------------
 // CREATE
@@ -75,5 +72,5 @@ export async function streamStart(input: StreamDiaryInput) {
 
 	if (!res.ok) throw new Error("Failed to start stream diary");
 
-	return (await res.json()) as StreamDiaryResponse;
+	return (await res.json()) as { firstDraft: string };
 }

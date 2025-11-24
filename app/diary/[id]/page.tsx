@@ -1,11 +1,13 @@
-import { Header } from "@/components/header";
 import { DiarySidebar } from "@/components/diary-sidebar";
-import { DiaryContent } from "./diary-content";
+import { Header } from "@/components/header";
+import { requireCurrentUser } from "@/lib/auth";
 import { getDiaryById } from "./action";
+import { DiaryContent } from "./diary-content";
 
 export default async function FixedDiaryPage(props: {
 	params: Promise<{ id: string }>;
 }) {
+	await requireCurrentUser();
 	const { id } = await props.params;
 	const diary = await getDiaryById(id);
 

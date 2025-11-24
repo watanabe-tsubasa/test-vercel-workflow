@@ -1,10 +1,12 @@
 "use server";
 
+import { requireCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prismaClient";
 
 export async function getDiaryById(id: string) {
+	const { id: userId } = await requireCurrentUser();
 	const diary = await prisma.diary.findUnique({
-		where: { id },
+		where: { id, userId },
 		select: {
 			id: true,
 			title: true,

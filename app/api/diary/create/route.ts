@@ -1,12 +1,13 @@
 // /api/diary/create/route.ts
 
-import { NextResponse } from "next/server";
-import z from "zod";
-import { diaryWorkflow } from "../../../../workflows/diary-creation";
-import { start } from "workflow/api";
-import { prisma } from "@/lib/prismaClient";
 import { DiaryState } from "@prisma/client";
-import { demoId } from "@/lib/utils";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { start } from "workflow/api";
+import z from "zod";
+import { authOptions, ensureUserFromSession } from "@/lib/auth";
+import { prisma } from "@/lib/prismaClient";
+import { diaryWorkflow } from "@/workflows/diary-creation";
 
 const CreatePostBodySchema = z.object({
 	bullet: z.string(),
@@ -19,6 +20,11 @@ export interface CreateDiaryResponse {
 }
 
 export async function POST(request: Request) {
+	const session = await getServerSession(authOptions);
+	if (!session?.user?.id) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
 	const json = await request.json();
 
 	const parseResult = CreatePostBodySchema.safeParse(json);
@@ -33,19 +39,26 @@ export async function POST(request: Request) {
 	const { bullet, token } = body;
 	const date = new Date().toISOString();
 	try {
-		const baseDiary = await prisma.diary.create({
+		const user = await ensureUserFromSession();
+		if (!user) {
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		}
+
+		await prisma.diary.create({
 			data: {
 				title: "test",
 				date,
 				content: "test",
 				hasImage: false,
 				state: DiaryState.DRAFT,
-				userId: demoId,
+				userId: user.id,
 				workflowId: token,
 			},
 		});
 
-		await start(diaryWorkflow, [token, bullet]);
+		await start(diaryWorkflow, [
+			{ workflowId: token, bullets: bullet, userId: user.id },
+		]);
 
 		return NextResponse.json({
 			message: `Received diaryId: ${body.bullet}`,

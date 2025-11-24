@@ -1,15 +1,15 @@
-import {
+import type {
 	CreateDiaryInput,
 	CreateDiaryResponse,
 } from "./app/api/diary/create/route";
-import {
+import type {
 	ReviseDiaryInput,
 	ReviseDiaryResponse,
 } from "./app/api/diary/revise/route";
 import { demoId } from "./lib/utils";
 
 async function firstTest(input: CreateDiaryInput) {
-	const res = await fetch("http://127.0.2.2:3000/api/diary/create", {
+	const res = await fetch("http://localhost:3000/api/diary/create", {
 		method: "POST",
 		headers: {
 			"content-type": "application/json",
@@ -21,7 +21,7 @@ async function firstTest(input: CreateDiaryInput) {
 }
 
 async function secondTest(input: ReviseDiaryInput) {
-	const res = await fetch("http://127.0.2.2:3000/api/diary/revise", {
+	const res = await fetch("http://localhost:3000/api/diary/revise", {
 		method: "POST",
 		headers: {
 			"content-type": "application/json",
@@ -35,18 +35,20 @@ async function secondTest(input: ReviseDiaryInput) {
 async function main() {
 	const date = new Date().toString();
 	const workflowId = `${demoId}_${date}`;
-	const fisrtRes = await firstTest({
+	const firstRes = await firstTest({
 		bullet: "福岡でガンダムを見た",
 		token: workflowId,
 	});
-	// setTimeout(async () => {
-	// 	const secondRes = await secondTest({
-	// 		revisedBullets: "福岡でガンダムを見て楽しかった",
-	// 		workflowId: workflowId,
-	// 	});
-	// 	console.log(secondRes);
-	// }, 10000);
-	console.log(fisrtRes);
+
+	setTimeout(async () => {
+		const secondRes = await secondTest({
+			revisedBullets: "福岡でガンダムを見て楽しかった",
+			workflowId,
+		});
+		console.log("revise response:", secondRes);
+	}, 70_000);
+
+	console.log("create response:", firstRes);
 }
 
 main();
