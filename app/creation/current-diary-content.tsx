@@ -95,7 +95,7 @@ export function CurrentDiaryContent({
 						<div className="flex items-center justify-between">
 							<h2 className="text-xl font-bold text-foreground">画像</h2>
 						</div>
-						<div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-muted">
+						<div className="relative aspect-4/3 overflow-hidden rounded-lg border border-border bg-muted">
 							{status === "DRAWING" && (
 								<div className="flex h-full items-center justify-center">
 									<div className="text-center">
