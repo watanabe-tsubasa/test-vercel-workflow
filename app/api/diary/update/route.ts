@@ -1,5 +1,7 @@
 // /api/diary/update/route.ts
 
+export const runtime = "nodejs";
+
 import { type Diary, DiaryState } from "@prisma/client";
 import { NextResponse } from "next/server";
 import z from "zod";

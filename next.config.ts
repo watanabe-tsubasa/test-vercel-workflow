@@ -14,28 +14,31 @@ const nextConfig: NextConfig = {
 
   serverExternalPackages: ["@prisma/client", "prisma"],
 
-  output: "standalone",
-
   webpack(config) {
     config.externals.push("@prisma/client", "prisma");
 
-    // 🔥 Prisma バイナリを .next/standalone に強制コピーする
     config.plugins.push({
       apply: (compiler: { hooks: { afterEmit: { tap: (arg0: string, arg1: () => void) => void; }; }; }) => {
         compiler.hooks.afterEmit.tap("CopyPrismaEngines", () => {
-          const src = path.join(process.cwd(), "node_modules/.prisma/client");
-          const dest = path.join(
-            process.cwd(),
-            ".next/standalone/node_modules/.prisma/client"
-          );
+          const srcDir = path.join(process.cwd(), "node_modules/.prisma/client");
+          const vercelOutput = path.join(process.cwd(), ".vercel/output/functions");
 
-          if (!fs.existsSync(dest)) {
-            fs.mkdirSync(dest, { recursive: true });
-          }
+          if (!fs.existsSync(srcDir)) return;
+          if (!fs.existsSync(vercelOutput)) return;
 
-          if (fs.existsSync(src)) {
-            fs.readdirSync(src).forEach((file) => {
-              fs.copyFileSync(path.join(src, file), path.join(dest, file));
+          console.log("Copying Prisma engines to Vercel functions...");
+
+          const functions = fs.readdirSync(vercelOutput);
+
+          for (const fn of functions) {
+            const fnDir = path.join(vercelOutput, fn, "index.func", "node_modules/.prisma/client");
+
+            if (!fs.existsSync(fnDir)) {
+              fs.mkdirSync(fnDir, { recursive: true });
+            }
+
+            fs.readdirSync(srcDir).forEach((file) => {
+              fs.copyFileSync(path.join(srcDir, file), path.join(fnDir, file));
             });
           }
         });

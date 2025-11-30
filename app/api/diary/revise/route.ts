@@ -1,5 +1,7 @@
 // /api/diary/revise/route.ts
 
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import z from "zod";
 import { userEditedHookClient } from "../../../../workflows/hook-client";
