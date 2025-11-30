@@ -8,43 +8,64 @@ import { cn } from "@/lib/utils";
 export async function DiarySidebar() {
 	const diaries = await getDiaries();
 	return (
-		<div className="flex h-full w-80 flex-col border-r border-border bg-sidebar hide-on-mobile">
-			<div className="border-b border-sidebar-border p-4">
-				<h2 className="text-lg font-semibold text-sidebar-foreground">
-					これまでの日記
-				</h2>
-			</div>
-			<ScrollArea className="flex-1">
-				<div className="space-y-1 p-2">
-					{diaries.map((diary) => (
-						<Link href={`/diary/${diary.id}`} key={diary.id}>
-							<Button
-								key={diary.id}
-								variant="ghost"
-								className={cn(
-									"h-auto w-full justify-start gap-3 px-3 py-3 text-left hover:bg-sidebar-accent",
-									diary.id === "1" && "bg-sidebar-accent",
-								)}
-							>
-								<div className="flex flex-1 flex-col gap-1">
-									<div className="flex items-center gap-2">
-										<span className="font-medium text-sidebar-foreground">
-											{diary.title}
-										</span>
-										{diary.hasImage && (
-											<ImageIcon className="h-3.5 w-3.5 text-sidebar-primary" />
-										)}
-									</div>
-									<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-										<Calendar className="h-3 w-3" />
-										<span>{diary.date}</span>
-									</div>
-								</div>
-							</Button>
-						</Link>
-					))}
+		<>
+			<div className="hidden md:flex h-headerless w-80 flex-col border-r border-border bg-sidebar hide-on-mobile">
+				<div className="border-b border-sidebar-border p-4">
+					<h2 className="text-lg font-semibold text-sidebar-foreground">
+						これまでの日記
+					</h2>
 				</div>
-			</ScrollArea>
-		</div>
+				<ScrollArea className="flex-1">
+					<div className="space-y-1 p-2">
+						{diaries.map((diary) => (
+							<Link href={`/diary/${diary.id}`} key={diary.id}>
+								<Button
+									key={diary.id}
+									variant="ghost"
+									className={cn(
+										"h-auto w-full justify-start gap-3 px-3 py-3 text-left hover:bg-sidebar-accent",
+										diary.id === "1" && "bg-sidebar-accent",
+									)}
+								>
+									<div className="flex flex-1 flex-col gap-1">
+										<div className="flex items-center gap-2">
+											<span className="font-medium text-sidebar-foreground">
+												{diary.title}
+											</span>
+											{diary.hasImage && (
+												<ImageIcon className="h-3.5 w-3.5 text-sidebar-primary" />
+											)}
+										</div>
+										<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+											<Calendar className="h-3 w-3" />
+											<span>{diary.date}</span>
+										</div>
+									</div>
+								</Button>
+							</Link>
+						))}
+					</div>
+				</ScrollArea>
+			</div>
+			<div className="md:hidden p-4">
+				<details className="rounded-lg border border-border bg-card">
+					<summary className="cursor-pointer px-4 py-3 text-sm font-medium">
+						日記一覧を開く
+					</summary>
+					<div className="divide-y">
+						{diaries.map((d) => (
+							<Link
+								href={`/diary/${d.id}`}
+								key={d.id}
+								className="flex items-center justify-between px-4 py-3 text-sm"
+							>
+								<span>{d.title}</span>
+								<span className="text-muted-foreground">{d.date}</span>
+							</Link>
+						))}
+					</div>
+				</details>
+			</div>
+		</>
 	);
 }

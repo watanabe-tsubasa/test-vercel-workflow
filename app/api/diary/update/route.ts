@@ -2,16 +2,17 @@
 
 export const runtime = "nodejs";
 
-import { type Diary, DiaryState } from "@prisma/client";
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import z from "zod";
-import { prisma } from "@/lib/prismaClient";
+import { type Diary, diaries, diaryStateEnum } from "@/db/schema";
+import { db } from "@/lib/db";
 
 const UpdateDiarySchema = z.object({
 	workflowId: z.string(),
 	imageUrl: z.string().optional(),
 	hasImage: z.boolean().optional(),
-	state: z.nativeEnum(DiaryState).optional(),
+	state: z.enum(diaryStateEnum.enumValues).optional(),
 	content: z.string().optional(),
 	title: z.string().optional(),
 });
@@ -40,12 +41,20 @@ export async function POST(req: Request) {
 			);
 		}
 
-		const { workflowId, ...updateData } = parsed.data;
+		const { workflowId, ...rest } = parsed.data;
+		const updateData = Object.fromEntries(
+			Object.entries(rest).filter(([, value]) => value !== undefined),
+		) as Omit<UpdateDiaryInput, "workflowId">;
 
-		const updatedDiary = await prisma.diary.update({
-			where: { workflowId },
-			data: updateData,
-		});
+		const [updatedDiary] = await db
+			.update(diaries)
+			.set({ ...updateData, updatedAt: new Date() })
+			.where(eq(diaries.workflowId, workflowId))
+			.returning();
+
+		if (!updatedDiary) {
+			return NextResponse.json({ error: "Not found" }, { status: 404 });
+		}
 
 		return NextResponse.json({
 			status: "ok",

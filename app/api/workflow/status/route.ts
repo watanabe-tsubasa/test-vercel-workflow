@@ -1,8 +1,10 @@
+import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
+import { diaries } from "@/db/schema";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prismaClient";
+import { db } from "@/lib/db";
 
 const QuerySchema = z.object({
 	workflowId: z.string(),
@@ -27,19 +29,24 @@ export async function GET(req: Request) {
 
 	const { workflowId } = parseResult.data;
 
-	const diary = await prisma.diary.findUnique({
-		where: { workflowId, userId: session.user.id },
-		select: {
-			id: true,
-			title: true,
-			state: true,
-			imageUrl: true,
-			hasImage: true,
-			updatedAt: true,
-			createdAt: true,
-			content: true,
-		},
-	});
+	const [diary] = await db
+		.select({
+			id: diaries.id,
+			title: diaries.title,
+			state: diaries.state,
+			imageUrl: diaries.imageUrl,
+			hasImage: diaries.hasImage,
+			updatedAt: diaries.updatedAt,
+			createdAt: diaries.createdAt,
+			content: diaries.content,
+		})
+		.from(diaries)
+		.where(
+			and(
+				eq(diaries.workflowId, workflowId),
+				eq(diaries.userId, session.user.id),
+			),
+		);
 
 	if (!diary) {
 		// Workflow has not created the diary record yet or workflowId is unknown.

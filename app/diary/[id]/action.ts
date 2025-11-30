@@ -1,21 +1,23 @@
 "use server";
 
+import { and, eq } from "drizzle-orm";
+import { diaries } from "@/db/schema";
 import { requireCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prismaClient";
+import { db } from "@/lib/db";
 
 export async function getDiaryById(id: string) {
 	const { id: userId } = await requireCurrentUser();
-	const diary = await prisma.diary.findUnique({
-		where: { id, userId },
-		select: {
-			id: true,
-			title: true,
-			date: true,
-			content: true,
-			imageUrl: true,
-			hasImage: true,
-		},
-	});
+	const [diary] = await db
+		.select({
+			id: diaries.id,
+			title: diaries.title,
+			date: diaries.date,
+			content: diaries.content,
+			imageUrl: diaries.imageUrl,
+			hasImage: diaries.hasImage,
+		})
+		.from(diaries)
+		.where(and(eq(diaries.id, id), eq(diaries.userId, userId)));
 
 	if (!diary) return null;
 

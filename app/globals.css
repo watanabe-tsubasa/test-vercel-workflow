@@ -6,6 +6,8 @@
 :root {
   --background: oklch(0.99 0.005 85);
   --foreground: oklch(0.25 0.01 85);
+  --header-height: 4rem;
+  --page-height: calc(100vh - var(--header-height));
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.25 0.01 85);
   --popover: oklch(1 0 0);
@@ -91,5 +93,17 @@
     .hide-on-mobile {
       @apply hidden;
     }
+  }
+}
+
+@layer utilities {
+  .min-h-headerless {
+    min-height: var(--page-height);
+  }
+  .h-headerless {
+    height: var(--page-height);
+  }
+  .max-h-headerless {
+    max-height: var(--page-height);
   }
 }

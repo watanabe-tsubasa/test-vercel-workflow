@@ -1,7 +1,6 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -13,9 +12,8 @@ import {
 
 export default function Login() {
 	return (
-		<div className="flex h-screen flex-col">
-			<Header />
-			<div className="flex flex-1 justify-center items-center">
+		<div className="flex min-h-headerless flex-col bg-muted/30">
+			<div className="flex flex-1 items-center justify-center">
 				<Card className="w-full max-w-sm">
 					<CardHeader>
 						<CardTitle>Login to your account</CardTitle>

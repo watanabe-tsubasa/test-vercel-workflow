@@ -2,13 +2,14 @@
 
 export const runtime = "nodejs";
 
-import { DiaryState } from "@prisma/client";
+import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { start } from "workflow/api";
 import z from "zod";
+import { diaries } from "@/db/schema";
 import { authOptions, ensureUserFromSession } from "@/lib/auth";
-import { prisma } from "@/lib/prismaClient";
+import { db } from "@/lib/db";
 import { diaryWorkflow } from "@/workflows/diary-creation";
 
 const CreatePostBodySchema = z.object({
@@ -39,23 +40,25 @@ export async function POST(request: Request) {
 
 	const body = parseResult.data;
 	const { bullet, token } = body;
-	const date = new Date().toISOString();
+	const date = new Date();
+	const now = new Date();
 	try {
 		const user = await ensureUserFromSession();
 		if (!user) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
-		await prisma.diary.create({
-			data: {
-				title: "",
-				date,
-				content: bullet,
-				hasImage: false,
-				state: DiaryState.DRAFT,
-				userId: user.id,
-				workflowId: token,
-			},
+		await db.insert(diaries).values({
+			id: randomUUID(),
+			title: "",
+			date,
+			content: bullet,
+			hasImage: false,
+			state: "DRAFT",
+			userId: user.id,
+			workflowId: token,
+			createdAt: now,
+			updatedAt: now,
 		});
 
 		await start(diaryWorkflow, [

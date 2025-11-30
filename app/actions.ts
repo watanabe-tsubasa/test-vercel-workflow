@@ -1,7 +1,9 @@
 "use server";
 
+import { and, desc, eq, ne } from "drizzle-orm";
+import { diaries } from "@/db/schema";
 import { requireCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prismaClient";
+import { db } from "@/lib/db";
 
 // 汎用で使うserver action
 
@@ -17,45 +19,22 @@ type Diaries = Array<{
 
 export async function getDiaries(): Promise<Diaries> {
 	const { id: currentUserId } = await requireCurrentUser();
-	const diaries = await prisma.diary.findMany({
-		where: { userId: currentUserId },
-		select: { id: true, title: true, date: true, hasImage: true },
-		orderBy: { date: "desc" },
-	});
+	const rows = await db
+		.select({
+			id: diaries.id,
+			title: diaries.title,
+			date: diaries.date,
+			hasImage: diaries.hasImage,
+			state: diaries.state,
+		})
+		.from(diaries)
+		.where(eq(diaries.userId, currentUserId))
+		.orderBy(desc(diaries.date));
 
-	if (diaries.length === 0) {
-		return [
-			{
-				id: "1",
-				title: "公園でピクニック",
-				date: "2024年1月15日",
-				hasImage: true,
-			},
-			{
-				id: "2",
-				title: "友達とカフェ巡り",
-				date: "2024年1月14日",
-				hasImage: true,
-			},
-			{
-				id: "3",
-				title: "新しい本を読んだ",
-				date: "2024年1月13日",
-				hasImage: false,
-			},
-			{ id: "4", title: "料理に挑戦", date: "2024年1月12日", hasImage: true },
-			{
-				id: "5",
-				title: "散歩で見つけた景色",
-				date: "2024年1月11日",
-				hasImage: true,
-			},
-		];
-	}
-
-	return diaries.map((d) => ({
+	return rows.map((d) => ({
 		...d,
-		date: d.date.toLocaleDateString("ja-JP", {
+		state: d.state ?? undefined,
+		date: d.date?.toLocaleDateString("ja-JP", {
 			year: "numeric",
 			month: "2-digit",
 			day: "2-digit",
@@ -65,23 +44,25 @@ export async function getDiaries(): Promise<Diaries> {
 
 export async function getInProgressDiaries(): Promise<Diaries> {
 	const { id: currentUserId } = await requireCurrentUser();
-	const diaries = await prisma.diary.findMany({
-		where: { userId: currentUserId, NOT: { state: "COMPLETED" } },
-		select: {
-			id: true,
-			title: true,
-			date: true,
-			hasImage: true,
-			state: true,
-			workflowId: true,
-			content: true,
-		},
-		orderBy: { updatedAt: "desc" },
-	});
+	const rows = await db
+		.select({
+			id: diaries.id,
+			title: diaries.title,
+			date: diaries.date,
+			hasImage: diaries.hasImage,
+			state: diaries.state,
+			workflowId: diaries.workflowId,
+			content: diaries.content,
+		})
+		.from(diaries)
+		.where(
+			and(eq(diaries.userId, currentUserId), ne(diaries.state, "COMPLETED")),
+		)
+		.orderBy(desc(diaries.updatedAt));
 
-	return diaries.map((d) => ({
+	return rows.map((d) => ({
 		...d,
-		date: d.date.toLocaleDateString("ja-JP", {
+		date: d.date?.toLocaleDateString("ja-JP", {
 			year: "numeric",
 			month: "2-digit",
 			day: "2-digit",

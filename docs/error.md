@@ -1,170 +1,149 @@
 # error.md
 
 ```bash
- ✓ Ready in 1161ms
- GET /api/auth/session 200 in 849ms (compile: 831ms, render: 18ms)
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."date", "public"."Diary"."hasImage" FROM "public"."Diary" WHERE "public"."Diary"."userId" = $1 ORDER BY "public"."Diary"."date" DESC OFFSET $2
- GET / 200 in 3.5s (compile: 1915ms, proxy.ts: 82ms, render: 1533ms)
- GET /api/auth/session 200 in 23ms (compile: 13ms, render: 10ms)
-prisma:query SELECT 1
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."date", "public"."Diary"."hasImage", "public"."Diary"."state"::text FROM "public"."Diary" WHERE ("public"."Diary"."userId" = $1 AND (NOT "public"."Diary"."state" = CAST($2::text AS "public"."DiaryState"))) ORDER BY "public"."Diary"."updatedAt" DESC OFFSET $3
- GET /creation 200 in 870ms (compile: 415ms, proxy.ts: 3ms, render: 451ms)
-prisma:query INSERT INTO "public"."User" ("id","name","email","image","createdAt","updatedAt") VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT ("id") DO UPDATE SET "email" = $7, "name" = $8, "image" = $9, "updatedAt" = $10 WHERE ("public"."User"."id" = $11 AND 1=1) RETURNING "public"."User"."id", "public"."User"."name", "public"."User"."email", "public"."User"."image", "public"."User"."createdAt", "public"."User"."updatedAt"
-prisma:query INSERT INTO "public"."Diary" ("id","title","date","content","hasImage","state","workflowId","userId","createdAt","updatedAt") VALUES ($1,$2,$3,$4,$5,CAST($6::text AS "public"."DiaryState"),$7,$8,$9,$10) RETURNING "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."date", "public"."Diary"."content", "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."state"::text, "public"."Diary"."workflowId", "public"."Diary"."userId", "public"."Diary"."createdAt", "public"."Diary"."updatedAt"
- POST /api/diary/create 200 in 1391ms (compile: 812ms, proxy.ts: 3ms, render: 576ms)
-[workflow] start diary {
-  workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848',
-  userId: '104263134803068175465'
+Rebuilt steps bundle 104ms
+Rebuilt workflow bundle 12ms
+ GET / 200 in 3.2s (compile: 1986ms, proxy.ts: 86ms, render: 1123ms)
+ GET /api/auth/session 200 in 1114ms (compile: 1095ms, render: 19ms)
+ GET / 200 in 492ms (compile: 2ms, proxy.ts: 3ms, render: 487ms)
+ GET / 200 in 193ms (compile: 3ms, proxy.ts: 4ms, render: 187ms)
+ GET /diary/cmilsxzui000jsbom8gfmw7uu 200 in 1506ms (compile: 729ms, proxy.ts: 3ms, render: 774ms)
+ GET / 200 in 156ms (compile: 1698µs, proxy.ts: 3ms, render: 151ms)
+ GET /creation 200 in 467ms (compile: 302ms, proxy.ts: 2ms, render: 163ms)
+Error [NeonDbError]: null value in column "updatedAt" of relation "Diary" violates not-null constraint
+    at async POST (app/api/diary/create/route.ts:50:3)
+  48 |          }
+  49 |
+> 50 |          await db.insert(diaries).values({
+     |          ^
+  51 |                  id: randomUUID(),
+  52 |                  title: "",
+  53 |                  date, {
+  severity: 'ERROR',
+  code: '23502',
+  detail: 'Failing row contains (983a4b77-7d45-4910-b144-b3b2acd48e2a, , 2025-11-30 15:59:37.851, ・ジャパンカップを見に行った\n' +
+    '・府中競馬場は..., null, f, 104263134803068175465, 2025-11-30 15:59:38.59, null, DRAFT, 470a3842-9ca1-430a-bd89-2bb1e7aa482a).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'Diary',
+  column: 'updatedAt',
+  dataType: undefined,
+  constraint: undefined,
+  file: 'execMain.c',
+  line: '1991',
+  routine: 'ExecConstraints',
+  sourceError: undefined
 }
- POST /.well-known/workflow/v1/flow 200 in 259ms (compile: 241ms, proxy.ts: 1888µs, render: 16ms)
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."state"::text, "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."updatedAt", "public"."Diary"."createdAt", "public"."Diary"."content" FROM "public"."Diary" WHERE ("public"."Diary"."workflowId" = $1 AND "public"."Diary"."userId" = $2) LIMIT $3 OFFSET $4
- GET /api/workflow/status?workflowId=07d5f26c-8713-4e1f-aa4d-c2f31461e848 200 in 509ms (compile: 181ms, proxy.ts: 3ms, render: 325ms)
-prisma:query UPDATE "public"."Diary" SET "state" = CAST($1::text AS "public"."DiaryState"), "updatedAt" = $2 WHERE ("public"."Diary"."workflowId" = $3 AND 1=1) RETURNING "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."date", "public"."Diary"."content", "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."state"::text, "public"."Diary"."workflowId", "public"."Diary"."userId", "public"."Diary"."createdAt", "public"."Diary"."updatedAt"
- POST /api/diary/update 200 in 606ms (compile: 80ms, proxy.ts: 3ms, render: 522ms)
- POST /.well-known/workflow/v1/step 200 in 1079ms (compile: 455ms, proxy.ts: 1523µs, render: 623ms)
-[workflow] start diary {
-  workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848',
-  userId: '104263134803068175465'
+ POST /api/diary/create 200 in 1911ms (compile: 947ms, proxy.ts: 4ms, render: 960ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 322ms (compile: 193ms, proxy.ts: 4ms, render: 124ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 143ms (compile: 1315µs, proxy.ts: 3ms, render: 139ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 125ms (compile: 1243µs, proxy.ts: 1972µs, render: 122ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 124ms (compile: 1251µs, proxy.ts: 1704µs, render: 121ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 141ms (compile: 1184µs, proxy.ts: 2ms, render: 138ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 131ms (compile: 1149µs, proxy.ts: 3ms, render: 127ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 153ms (compile: 1042µs, proxy.ts: 1752µs, render: 150ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 148ms (compile: 1113µs, proxy.ts: 1771µs, render: 145ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 133ms (compile: 1115µs, proxy.ts: 1880µs, render: 130ms)
+ POST /api/internal/ai/stream-start 200 in 20.9s (compile: 731ms, proxy.ts: 3ms, render: 20.2s)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 136ms (compile: 1043µs, proxy.ts: 1790µs, render: 133ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 132ms (compile: 1033µs, proxy.ts: 1616µs, render: 129ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 121ms (compile: 1032µs, proxy.ts: 1624µs, render: 119ms)
+ GET /api/workflow/status?workflowId=470a3842-9ca1-430a-bd89-2bb1e7aa482a 202 in 124ms (compile: 1112µs, proxy.ts: 1783µs, render: 121ms)
+ GET / 200 in 166ms (compile: 2ms, proxy.ts: 2ms, render: 162ms)
+ GET / 200 in 241ms (compile: 1859µs, proxy.ts: 3ms, render: 236ms)
+ GET /api/auth/session 200 in 12ms (compile: 5ms, render: 7ms)
+ GET / 200 in 149ms (compile: 1308µs, proxy.ts: 4ms, render: 144ms)
+ GET / 200 in 176ms (compile: 1731µs, proxy.ts: 1737µs, render: 173ms)
+ GET / 200 in 206ms (compile: 1188µs, proxy.ts: 1861µs, render: 203ms)
+ GET /creation 200 in 139ms (compile: 3ms, proxy.ts: 1891µs, render: 134ms)
+ GET /api/auth/session 200 in 24ms (compile: 16ms, render: 8ms)
+Error [NeonDbError]: null value in column "updatedAt" of relation "Diary" violates not-null constraint
+    at async POST (app/api/diary/create/route.ts:50:3)
+  48 |          }
+  49 |
+> 50 |          await db.insert(diaries).values({
+     |          ^
+  51 |                  id: randomUUID(),
+  52 |                  title: "",
+  53 |                  date, {
+  severity: 'ERROR',
+  code: '23502',
+  detail: 'Failing row contains (daf1148d-e92f-4e73-9187-ff35eda34a33, , 2025-11-30 16:00:31.59, ・ジャパンカップを見に行った, null, f, 104263134803068175465, 2025-11-30 16:00:32.357, null, DRAFT, c0f1541c-02b8-4672-8684-68b8eafb69b3).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'Diary',
+  column: 'updatedAt',
+  dataType: undefined,
+  constraint: undefined,
+  file: 'execMain.c',
+  line: '1991',
+  routine: 'ExecConstraints',
+  sourceError: undefined
 }
-[workflow] generating first draft { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
- POST /.well-known/workflow/v1/flow 200 in 15ms (compile: 1842µs, proxy.ts: 1702µs, render: 11ms)
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."state"::text, "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."updatedAt", "public"."Diary"."createdAt", "public"."Diary"."content" FROM "public"."Diary" WHERE ("public"."Diary"."workflowId" = $1 AND "public"."Diary"."userId" = $2) LIMIT $3 OFFSET $4
- GET /api/workflow/status?workflowId=07d5f26c-8713-4e1f-aa4d-c2f31461e848 200 in 148ms (compile: 1297µs, proxy.ts: 2ms, render: 144ms)
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."state"::text, "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."updatedAt", "public"."Diary"."createdAt", "public"."Diary"."content" FROM "public"."Diary" WHERE ("public"."Diary"."workflowId" = $1 AND "public"."Diary"."userId" = $2) LIMIT $3 OFFSET $4
- GET /api/workflow/status?workflowId=07d5f26c-8713-4e1f-aa4d-c2f31461e848 200 in 132ms (compile: 4ms, proxy.ts: 2ms, render: 126ms)
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."state"::text, "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."updatedAt", "public"."Diary"."createdAt", "public"."Diary"."content" FROM "public"."Diary" WHERE ("public"."Diary"."workflowId" = $1 AND "public"."Diary"."userId" = $2) LIMIT $3 OFFSET $4
- GET /api/workflow/status?workflowId=07d5f26c-8713-4e1f-aa4d-c2f31461e848 200 in 127ms (compile: 1129µs, proxy.ts: 1979µs, render: 124ms)
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."state"::text, "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."updatedAt", "public"."Diary"."createdAt", "public"."Diary"."content" FROM "public"."Diary" WHERE ("public"."Diary"."workflowId" = $1 AND "public"."Diary"."userId" = $2) LIMIT $3 OFFSET $4
- GET /api/workflow/status?workflowId=07d5f26c-8713-4e1f-aa4d-c2f31461e848 200 in 124ms (compile: 1031µs, proxy.ts: 1820µs, render: 121ms)
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."state"::text, "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."updatedAt", "public"."Diary"."createdAt", "public"."Diary"."content" FROM "public"."Diary" WHERE ("public"."Diary"."workflowId" = $1 AND "public"."Diary"."userId" = $2) LIMIT $3 OFFSET $4
- GET /api/workflow/status?workflowId=07d5f26c-8713-4e1f-aa4d-c2f31461e848 200 in 129ms (compile: 1162µs, proxy.ts: 2ms, render: 125ms)
-prisma:query SELECT 1
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."state"::text, "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."updatedAt", "public"."Diary"."createdAt", "public"."Diary"."content" FROM "public"."Diary" WHERE ("public"."Diary"."workflowId" = $1 AND "public"."Diary"."userId" = $2) LIMIT $3 OFFSET $4
- GET /api/workflow/status?workflowId=07d5f26c-8713-4e1f-aa4d-c2f31461e848 200 in 258ms (compile: 1018µs, proxy.ts: 1958µs, render: 255ms)
-streamtext: 朝、近所の公園をゆっくり散歩した。ひんやりした空気に頬が冷たく、足元の落ち葉がかさりと鳴るたびに気持ちが整っていく感じがした。散歩の帰りにカフェに寄って、淹れたての美味しいコーヒーを一杯。立ちのぼる香りにほっとして、体の内側からあたたまった。
-
-昼過ぎには友達と電話で近況を話した。たわいもない話でよく笑って、ちょっと肩の力が抜けた気がする。夕方、空を見上げると見事な夕焼け。桃色から橙色へとにじむグラデーションが広がり、今日という一日をやさしく包んでくれた。穏やかで満たされた一日だった。
- POST /api/internal/ai/stream-start 200 in 13.3s (compile: 91ms, proxy.ts: 1587µs, render: 13.3s)
- POST /.well-known/workflow/v1/step 200 in 13.4s (compile: 1687µs, proxy.ts: 2ms, render: 13.4s)
-[workflow] start diary {
-  workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848',
-  userId: '104263134803068175465'
+ POST /api/diary/create 200 in 955ms (compile: 10ms, proxy.ts: 5ms, render: 940ms)
+ GET /api/workflow/status?workflowId=c0f1541c-02b8-4672-8684-68b8eafb69b3 202 in 128ms (compile: 3ms, proxy.ts: 3ms, render: 123ms)
+ GET /api/workflow/status?workflowId=c0f1541c-02b8-4672-8684-68b8eafb69b3 202 in 132ms (compile: 1049µs, proxy.ts: 2ms, render: 129ms)
+ GET /api/workflow/status?workflowId=c0f1541c-02b8-4672-8684-68b8eafb69b3 202 in 159ms (compile: 1066µs, proxy.ts: 1757µs, render: 156ms)
+ POST /api/internal/ai/stream-start 200 in 6.2s (compile: 4ms, proxy.ts: 4ms, render: 6.2s)
+Error [NeonDbError]: null value in column "updatedAt" of relation "Diary" violates not-null constraint
+    at async POST (app/api/diary/create/route.ts:50:3)
+  48 |          }
+  49 |
+> 50 |          await db.insert(diaries).values({
+     |          ^
+  51 |                  id: randomUUID(),
+  52 |                  title: "",
+  53 |                  date, {
+  severity: 'ERROR',
+  code: '23502',
+  detail: 'Failing row contains (19e8384c-62f1-438c-967b-6497366bd07c, , 2025-11-30 16:00:37.766, ・ジャパンカップを見に行った, null, f, 104263134803068175465, 2025-11-30 16:00:38.236, null, DRAFT, 6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'Diary',
+  column: 'updatedAt',
+  dataType: undefined,
+  constraint: undefined,
+  file: 'execMain.c',
+  line: '1991',
+  routine: 'ExecConstraints',
+  sourceError: undefined
 }
-[workflow] generating first draft { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
- POST /.well-known/workflow/v1/flow 200 in 17ms (compile: 3ms, proxy.ts: 1315µs, render: 12ms)
-prisma:query UPDATE "public"."Diary" SET "state" = CAST($1::text AS "public"."DiaryState"), "content" = $2, "updatedAt" = $3 WHERE ("public"."Diary"."workflowId" = $4 AND 1=1) RETURNING "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."date", "public"."Diary"."content", "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."state"::text, "public"."Diary"."workflowId", "public"."Diary"."userId", "public"."Diary"."createdAt", "public"."Diary"."updatedAt"
- POST /api/diary/update 200 in 362ms (compile: 855µs, proxy.ts: 1249µs, render: 360ms)
- POST /.well-known/workflow/v1/step 200 in 376ms (compile: 1694µs, proxy.ts: 1182µs, render: 373ms)
-[workflow] start diary {
-  workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848',
-  userId: '104263134803068175465'
-}
-[workflow] generating first draft { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
-[workflow] waiting user edit { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
- POST /.well-known/workflow/v1/flow 200 in 15ms (compile: 1478µs, proxy.ts: 2ms, render: 11ms)
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."state"::text, "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."updatedAt", "public"."Diary"."createdAt", "public"."Diary"."content" FROM "public"."Diary" WHERE ("public"."Diary"."workflowId" = $1 AND "public"."Diary"."userId" = $2) LIMIT $3 OFFSET $4
- GET /api/workflow/status?workflowId=07d5f26c-8713-4e1f-aa4d-c2f31461e848 200 in 146ms (compile: 990µs, proxy.ts: 1841µs, render: 143ms)
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."state"::text, "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."updatedAt", "public"."Diary"."createdAt", "public"."Diary"."content" FROM "public"."Diary" WHERE ("public"."Diary"."workflowId" = $1 AND "public"."Diary"."userId" = $2) LIMIT $3 OFFSET $4
- GET /api/workflow/status?workflowId=07d5f26c-8713-4e1f-aa4d-c2f31461e848 200 in 134ms (compile: 1064µs, proxy.ts: 1968µs, render: 131ms)
- POST /api/diary/revise 200 in 175ms (compile: 162ms, proxy.ts: 1850µs, render: 11ms)
-[workflow] start diary {
-  workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848',
-  userId: '104263134803068175465'
-}
-[workflow] generating first draft { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
-[workflow] waiting user edit { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
- POST /.well-known/workflow/v1/flow 200 in 38ms (compile: 2ms, proxy.ts: 1953µs, render: 34ms)
-prisma:query UPDATE "public"."Diary" SET "state" = CAST($1::text AS "public"."DiaryState"), "content" = $2, "updatedAt" = $3 WHERE ("public"."Diary"."workflowId" = $4 AND 1=1) RETURNING "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."date", "public"."Diary"."content", "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."state"::text, "public"."Diary"."workflowId", "public"."Diary"."userId", "public"."Diary"."createdAt", "public"."Diary"."updatedAt"
- POST /api/diary/update 200 in 136ms (compile: 874µs, proxy.ts: 1325µs, render: 134ms)
- POST /.well-known/workflow/v1/step 200 in 149ms (compile: 1563µs, proxy.ts: 1383µs, render: 146ms)
-[workflow] start diary {
-  workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848',
-  userId: '104263134803068175465'
-}
-[workflow] generating first draft { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
-[workflow] waiting user edit { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
-[workflow] generating image { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
- POST /.well-known/workflow/v1/flow 200 in 19ms (compile: 1437µs, proxy.ts: 1221µs, render: 16ms)
-Image generation failed with model gpt-image-1, trying fallback: Error [AI_APICallError]: Your organization must be verified to use the model `gpt-image-1`. Please go to: https://platform.openai.com/settings/organization/general and click on Verify Organization. If you just verified, it can take up to 15 minutes for access to propagate.
-    at async stepGenerateDiaryImage (app/.well-known/workflow/v1/step/route.js:142:24)
-  140 |     for (const modelId of imageModelCandidates) {
-  141 |       try {
-> 142 |         const result = await generateImage({
-      |                        ^
-  143 |           model: openai.imageModel(modelId),
-  144 |           prompt: `\u65E5\u8A18\u306E\u5185\u5BB9\u306B\u5408\u3046\u30A4\u30E9\u30B9\u30C8\u30921\u679A\u751F\u6210\u3057\u3066\u304F\u3060\u3055\u3044: ${prompt}`,
-  145 |           size: "1024x1024" {
-  cause: undefined,
-  url: 'https://api.openai.com/v1/images/generations',
-  requestBodyValues: [Object],
-  statusCode: 403,
-  responseHeaders: [Object],
-  responseBody: '{\n' +
-    '  "error": {\n' +
-    '    "message": "Your organization must be verified to use the model `gpt-image-1`. Please go to: https://platform.openai.com/settings/organization/general and click on Verify Organization. If you just verified, it can take up to 15 minutes for access to propagate.",\n' +
-    '    "type": "invalid_request_error",\n' +
-    '    "param": null,\n' +
-    '    "code": null\n' +
-    '  }\n' +
-    '}',
-  isRetryable: false,
-  data: [Object]
-}
-Image generation failed with model gpt-image-1-mini, trying fallback: Error [AI_APICallError]: Your organization must be verified to use the model `gpt-image-1-mini`. Please go to: https://platform.openai.com/settings/organization/general and click on Verify Organization. If you just verified, it can take up to 15 minutes for access to propagate.
-    at async stepGenerateDiaryImage (app/.well-known/workflow/v1/step/route.js:142:24)
-  140 |     for (const modelId of imageModelCandidates) {
-  141 |       try {
-> 142 |         const result = await generateImage({
-      |                        ^
-  143 |           model: openai.imageModel(modelId),
-  144 |           prompt: `\u65E5\u8A18\u306E\u5185\u5BB9\u306B\u5408\u3046\u30A4\u30E9\u30B9\u30C8\u30921\u679A\u751F\u6210\u3057\u3066\u304F\u3060\u3055\u3044: ${prompt}`,
-  145 |           size: "1024x1024" {
-  cause: undefined,
-  url: 'https://api.openai.com/v1/images/generations',
-  requestBodyValues: [Object],
-  statusCode: 403,
-  responseHeaders: [Object],
-  responseBody: '{\n' +
-    '  "error": {\n' +
-    '    "message": "Your organization must be verified to use the model `gpt-image-1-mini`. Please go to: https://platform.openai.com/settings/organization/general and click on Verify Organization. If you just verified, it can take up to 15 minutes for access to propagate.",\n' +
-    '    "type": "invalid_request_error",\n' +
-    '    "param": null,\n' +
-    '    "code": null\n' +
-    '  }\n' +
-    '}',
-  isRetryable: false,
-  data: [Object]
-}
-prisma:query SELECT "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."state"::text, "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."updatedAt", "public"."Diary"."createdAt", "public"."Diary"."content" FROM "public"."Diary" WHERE ("public"."Diary"."workflowId" = $1 AND "public"."Diary"."userId" = $2) LIMIT $3 OFFSET $4
- GET /api/workflow/status?workflowId=07d5f26c-8713-4e1f-aa4d-c2f31461e848 200 in 133ms (compile: 1104µs, proxy.ts: 1964µs, render: 130ms)
- POST /.well-known/workflow/v1/step 200 in 13.7s (compile: 1525µs, proxy.ts: 1529µs, render: 13.7s)
-[workflow] start diary {
-  workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848',
-  userId: '104263134803068175465'
-}
-[workflow] generating first draft { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
-[workflow] waiting user edit { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
-[workflow] generating image { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
- POST /.well-known/workflow/v1/flow 200 in 21ms (compile: 1778µs, proxy.ts: 1466µs, render: 18ms)
-prisma:query SELECT 1
-prisma:query UPDATE "public"."Diary" SET "imageUrl" = $1, "hasImage" = $2, "state" = CAST($3::text AS "public"."DiaryState"), "updatedAt" = $4 WHERE ("public"."Diary"."workflowId" = $5 AND 1=1) RETURNING "public"."Diary"."id", "public"."Diary"."title", "public"."Diary"."date", "public"."Diary"."content", "public"."Diary"."imageUrl", "public"."Diary"."hasImage", "public"."Diary"."state"::text, "public"."Diary"."workflowId", "public"."Diary"."userId", "public"."Diary"."createdAt", "public"."Diary"."updatedAt"
- POST /api/diary/update 200 in 402ms (compile: 1315µs, proxy.ts: 1848µs, render: 399ms)
- POST /.well-known/workflow/v1/step 200 in 418ms (compile: 1712µs, proxy.ts: 1416µs, render: 415ms)
-[workflow] start diary {
-  workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848',
-  userId: '104263134803068175465'
-}
-[workflow] generating first draft { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
-[workflow] waiting user edit { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
-[workflow] generating image { workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848' }
-[workflow] completed {
-  workflowId: '07d5f26c-8713-4e1f-aa4d-c2f31461e848',
-  diaryId: 'cmiljnen10001sbvfkn02v00s'
-}
- POST /.well-known/workflow/v1/flow 200 in 18ms (compile: 1418µs, proxy.ts: 1269µs, render: 15ms)
- GET /api/auth/session 200 in 21ms (compile: 12ms, render: 9ms)
- GET /api/auth/session 200 in 17ms (compile: 9ms, render: 8ms)
- GET /api/auth/session 200 in 9ms (compile: 4ms, render: 6ms)
- GET /api/auth/session 200 in 12ms (compile: 4ms, render: 8ms)
-
+ POST /api/diary/create 200 in 630ms (compile: 8ms, proxy.ts: 2ms, render: 621ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 133ms (compile: 934µs, proxy.ts: 1506µs, render: 131ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 122ms (compile: 1043µs, proxy.ts: 2ms, render: 118ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 115ms (compile: 1037µs, proxy.ts: 1722µs, render: 112ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 136ms (compile: 1072µs, proxy.ts: 1737µs, render: 133ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 128ms (compile: 1143µs, proxy.ts: 1692µs, render: 125ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 116ms (compile: 1101µs, proxy.ts: 1596µs, render: 114ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 116ms (compile: 1210µs, proxy.ts: 1816µs, render: 113ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 137ms (compile: 1006µs, proxy.ts: 1522µs, render: 135ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 144ms (compile: 1043µs, proxy.ts: 3ms, render: 140ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 127ms (compile: 1087µs, proxy.ts: 2ms, render: 124ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 227ms (compile: 1276µs, proxy.ts: 3ms, render: 222ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 127ms (compile: 1529µs, proxy.ts: 3ms, render: 122ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 131ms (compile: 684µs, proxy.ts: 2ms, render: 128ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 134ms (compile: 1012µs, proxy.ts: 1580µs, render: 131ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 133ms (compile: 1951µs, proxy.ts: 1944µs, render: 129ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 134ms (compile: 1577µs, proxy.ts: 3ms, render: 130ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 144ms (compile: 1138µs, proxy.ts: 3ms, render: 140ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 108ms (compile: 1100µs, proxy.ts: 1541µs, render: 106ms)
+ POST /api/internal/ai/stream-start 200 in 47s (compile: 1888µs, proxy.ts: 1721µs, render: 47s)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 126ms (compile: 1048µs, proxy.ts: 1901µs, render: 123ms)
+ GET /api/auth/session 200 in 13ms (compile: 5ms, render: 8ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 135ms (compile: 1007µs, proxy.ts: 1620µs, render: 132ms)
+ GET /api/workflow/status?workflowId=6a30c6a2-c6bd-4fa4-a5c1-8188f6cdfea7 202 in 115ms (compile: 969µs, proxy.ts: 1821µs, render: 112ms)
+ GET /creation 200 in 190ms (compile: 3ms, proxy.ts: 1985µs, render: 185ms)
+ GET /api/auth/session 200 in 9ms (compile: 4ms, render: 5ms
 ```

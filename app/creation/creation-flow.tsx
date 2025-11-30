@@ -1,11 +1,11 @@
 "use client";
 
-import type { DiaryState } from "@prisma/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DiaryInputSidebar } from "@/components/diary-input-sidebar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import type { DiaryState } from "@/db/schema";
 import { CurrentDiaryContent } from "./current-diary-content";
 import { InProgressDialog } from "./in-progress-dialog";
 
@@ -291,7 +291,7 @@ export function CreationFlow({
 				<DiaryInputSidebar onStart={handleStart} loading={loading} />
 			</div>
 			<main className="flex-1">
-				<div className="md:hidden flex justify-end p-4">
+				<div className="md:hidden flex justify-end px-4 py-4">
 					<Dialog>
 						<DialogTrigger asChild>
 							<Button variant="outline" size="sm">

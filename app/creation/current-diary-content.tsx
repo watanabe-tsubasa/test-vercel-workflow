@@ -1,12 +1,12 @@
 "use client";
 
-import type { DiaryState } from "@prisma/client";
 import { Check, ImageIcon, Loader2, PenLine } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import type { DiaryState } from "@/db/schema";
 
 interface Props {
 	status: DiaryState | "IDLE" | "PENDING";
@@ -51,7 +51,7 @@ export function CurrentDiaryContent({
 	}, [status]);
 
 	return (
-		<div className="mx-auto max-w-5xl space-y-6 h-full p-6">
+		<div className="mx-auto max-w-5xl space-y-6 h-full px-4 py-6 sm:px-6 lg:px-8">
 			<div className="flex items-center justify-between">
 				<div>
 					<p className="text-sm text-muted-foreground">進行状況</p>
@@ -64,17 +64,17 @@ export function CurrentDiaryContent({
 				)}
 			</div>
 
-			<Card className="overflow-hidden">
+			<Card className="overflow-hidden gap-0">
+				<CardHeader>
+					<CardTitle className="text-sm text-muted-foreground">
+						{title && title.trim().length > 0 ? title : "タイトル生成中..."}
+					</CardTitle>
+				</CardHeader>
 				<div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
 					<div className="space-y-4">
 						<div className="flex items-center justify-between">
 							<div className="flex flex-col">
 								<h2 className="text-xl font-bold text-foreground">文章</h2>
-								<p className="text-sm text-muted-foreground">
-									{title && title.trim().length > 0
-										? title
-										: "タイトル生成中..."}
-								</p>
 							</div>
 							{status === "DRAWING" && (
 								<span className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -92,7 +92,7 @@ export function CurrentDiaryContent({
 						<Textarea
 							value={draft}
 							onChange={(e) => setDraft(e.target.value)}
-							className="min-h-[280px]"
+							className="h-8/12 overflow-auto"
 							placeholder="生成された文章がここに表示されます"
 							disabled={
 								status === "COMPLETED" || status === "DRAWING" || reviseLoading

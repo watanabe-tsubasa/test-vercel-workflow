@@ -29,7 +29,7 @@ export function DiaryInputSidebar(props: {
 	};
 
 	return (
-		<div className="flex h-full w-80 flex-col border-r border-border bg-sidebar">
+		<div className="flex h-headerless w-80 flex-col border-r border-border bg-sidebar">
 			<div className="border-b border-sidebar-border p-4">
 				<h2 className="text-lg font-semibold text-sidebar-foreground">
 					入力内容

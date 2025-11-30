@@ -1,20 +1,18 @@
-import type { DiaryState } from "@prisma/client";
-import { Calendar, ImageIcon } from "lucide-react";
+import { Calendar, ImageIcon, PenSquare } from "lucide-react";
 import Link from "next/link";
 import { getDiaries } from "@/app/actions";
-import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import type { DiaryState } from "@/db/schema";
 import { requireCurrentUser } from "@/lib/auth";
 
 export default async function HomePage() {
 	await requireCurrentUser();
 	const diaries = await getDiaries();
 	return (
-		<div className="flex h-screen flex-col">
-			<Header />
-			<main className="flex-1 overflow-auto bg-muted/30">
-				<div className="mx-auto flex max-w-5xl flex-col gap-6 p-6">
+		<div className="flex min-h-headerless flex-col bg-muted/30">
+			<main className="flex-1 overflow-auto">
+				<div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
 					<div className="flex items-center justify-between">
 						<div>
 							<h1 className="text-2xl font-bold text-foreground">マイ日記</h1>
@@ -54,12 +52,22 @@ export default async function HomePage() {
 						))}
 					</div>
 					{diaries.length === 0 && (
-						<div className="text-center text-muted-foreground">
-							まだ日記がありません。
-							<Link href="/creation" className="text-primary underline">
-								日記を作成
-							</Link>
-							してください。
+						<div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-border bg-card/40 p-8 text-center text-muted-foreground">
+							<div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+								<PenSquare className="h-6 w-6" />
+							</div>
+							<div className="space-y-2">
+								<p className="text-lg font-semibold text-foreground">
+									まだ日記がありません
+								</p>
+								<p className="text-sm">
+									はじめての日記を作成して、AI
+									に文章と画像を生成してもらいましょう。
+								</p>
+							</div>
+							<Button asChild>
+								<Link href="/creation">新しい日記を作成する</Link>
+							</Button>
 						</div>
 					)}
 				</div>

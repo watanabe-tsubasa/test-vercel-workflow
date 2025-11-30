@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import NextAuth, { getServerSession, type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { prisma } from "@/lib/prismaClient";
+import { users } from "@/db/schema";
+import { db } from "@/lib/db";
 
 export const authOptions: NextAuthOptions = {
 	providers: [
@@ -60,20 +61,27 @@ export async function ensureUserFromSession() {
 	const session = await getAuthSession();
 	if (!session?.user?.id || !session.user.email) return null;
 
-	const user = await prisma.user.upsert({
-		where: { id: session.user.id },
-		update: {
-			email: session.user.email,
-			name: session.user.name ?? undefined,
-			image: session.user.image ?? undefined,
-		},
-		create: {
+	const now = new Date();
+	const [user] = await db
+		.insert(users)
+		.values({
 			id: session.user.id,
 			email: session.user.email,
 			name: session.user.name ?? null,
 			image: session.user.image ?? null,
-		},
-	});
+			createdAt: now,
+			updatedAt: now,
+		})
+		.onConflictDoUpdate({
+			target: users.id,
+			set: {
+				email: session.user.email,
+				name: session.user.name ?? null,
+				image: session.user.image ?? null,
+				updatedAt: now,
+			},
+		})
+		.returning();
 
-	return user;
+	return user ?? null;
 }

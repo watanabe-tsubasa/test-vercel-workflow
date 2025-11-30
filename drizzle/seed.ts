@@ -1,22 +1,35 @@
-import { DiaryState, PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { randomUUID } from "node:crypto";
+import { diaries, users } from "../db/schema";
+import { db } from "../lib/db";
 
 async function main() {
-	// まず既存データを削除（開発用）
-	await prisma.diary.deleteMany();
-	await prisma.user.deleteMany();
+	// 開発用: 既存データをクリア
+	await db.delete(diaries);
+	await db.delete(users);
 
-	// ユーザーを作成
-	const user = await prisma.user.create({
-		data: {
+	const now = new Date();
+	const [user] = await db
+		.insert(users)
+		.values({
+			id: randomUUID(),
 			name: "Alice",
 			email: "alice@example.com",
 			image: "https://example.com/avatar/alice.png",
-		},
-	});
+			createdAt: now,
+			updatedAt: now,
+		})
+		.onConflictDoUpdate({
+			target: users.email,
+			set: {
+				name: "Alice",
+				image: "https://example.com/avatar/alice.png",
+				updatedAt: now,
+			},
+		})
+		.returning();
 
-	// 絵日記データを作成
+	if (!user) throw new Error("Failed to seed user");
+
 	const diariesData = [
 		{
 			title: "春の公園でピクニック",
@@ -36,7 +49,7 @@ async function main() {
 				"こんな穏やかな一日を過ごせたことに、心から感謝している。",
 			imageUrl: "https://example.com/images/picnic.jpg",
 			hasImage: true,
-			state: DiaryState.COMPLETED,
+			state: "COMPLETED" as const,
 			workflowId: "wf_001",
 		},
 		{
@@ -46,7 +59,7 @@ async function main() {
 				"外は雨だったので、一日中お気に入りの小説を読んで過ごしました。心が落ち着く時間でした。",
 			imageUrl: "https://example.com/images/rainy-reading.jpg",
 			hasImage: true,
-			state: DiaryState.COMPLETED,
+			state: "COMPLETED" as const,
 			workflowId: "wf_002",
 		},
 		{
@@ -56,24 +69,22 @@ async function main() {
 				"今日は友達と映画館に行きました。アクション映画で、とてもスリル満点でした！",
 			imageUrl: "https://example.com/images/movie.jpg",
 			hasImage: true,
-			state: DiaryState.COMPLETED,
+			state: "COMPLETED" as const,
 			workflowId: "wf_003",
 		},
 	];
 
-	// DiaryデータをUserに紐づけて作成
-	await Promise.all(
-		diariesData.map((diary) =>
-			prisma.diary.create({
-				data: {
-					...diary,
-					userId: user.id,
-				},
-			}),
-		),
+	await db.insert(diaries).values(
+		diariesData.map((diary) => ({
+			...diary,
+			id: randomUUID(),
+			userId: user.id,
+			createdAt: now,
+			updatedAt: now,
+		})),
 	);
 
-	console.log("✅ Seed data inserted successfully!");
+	console.log("✅ Drizzle seed data inserted successfully!");
 }
 
 main()
@@ -81,6 +92,6 @@ main()
 		console.error(e);
 		process.exit(1);
 	})
-	.finally(async () => {
-		await prisma.$disconnect();
+	.finally(() => {
+		process.exit(0);
 	});
