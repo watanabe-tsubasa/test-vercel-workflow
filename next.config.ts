@@ -10,9 +10,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  experimental: {
-    serverComponentsExternalPackages: ["@prisma/client", "prisma"],
-  },
+  serverExternalPackages: ["@prisma/client", "prisma"],
 
   webpack(config) {
     config.externals.push("@prisma/client", "prisma");
