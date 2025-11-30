@@ -3,7 +3,7 @@
 import type { DiaryState } from "@prisma/client";
 import { Check, ImageIcon, Loader2, PenLine } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,18 +12,26 @@ interface Props {
 	status: DiaryState | "IDLE" | "PENDING";
 	content: string;
 	imageUrl: string | null;
+	title?: string;
 	updatedAt?: string;
 	onRevise: (content: string) => void;
+	reviseLoading?: boolean;
 }
 
 export function CurrentDiaryContent({
 	status,
 	content,
 	imageUrl,
+	title,
 	updatedAt,
 	onRevise,
+	reviseLoading = false,
 }: Props) {
 	const [draft, setDraft] = useState(content);
+
+	useEffect(() => {
+		setDraft(content);
+	}, [content]);
 
 	const stateLabel = useMemo(() => {
 		switch (status) {
@@ -60,7 +68,14 @@ export function CurrentDiaryContent({
 				<div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
 					<div className="space-y-4">
 						<div className="flex items-center justify-between">
-							<h2 className="text-xl font-bold text-foreground">文章</h2>
+							<div className="flex flex-col">
+								<h2 className="text-xl font-bold text-foreground">文章</h2>
+								<p className="text-sm text-muted-foreground">
+									{title && title.trim().length > 0
+										? title
+										: "タイトル生成中..."}
+								</p>
+							</div>
 							{status === "DRAWING" && (
 								<span className="flex items-center gap-2 text-sm text-muted-foreground">
 									<Loader2 className="h-4 w-4 animate-spin" />
@@ -79,13 +94,19 @@ export function CurrentDiaryContent({
 							onChange={(e) => setDraft(e.target.value)}
 							className="min-h-[280px]"
 							placeholder="生成された文章がここに表示されます"
-							disabled={status === "COMPLETED" || status === "DRAWING"}
+							disabled={
+								status === "COMPLETED" || status === "DRAWING" || reviseLoading
+							}
 						/>
 						{status === "WAITING_USER" && (
 							<div className="flex justify-end">
-								<Button onClick={() => onRevise(draft)} size="lg">
+								<Button
+									onClick={() => onRevise(draft)}
+									size="lg"
+									disabled={reviseLoading}
+								>
 									<PenLine className="mr-2 h-4 w-4" />
-									修正を送信
+									{reviseLoading ? "送信中..." : "修正を送信"}
 								</Button>
 							</div>
 						)}

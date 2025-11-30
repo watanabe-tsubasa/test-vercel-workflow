@@ -11,6 +11,7 @@ const UpdateDiarySchema = z.object({
 	hasImage: z.boolean().optional(),
 	state: z.nativeEnum(DiaryState).optional(),
 	content: z.string().optional(),
+	title: z.string().optional(),
 });
 
 export type UpdateDiaryInput = z.infer<typeof UpdateDiarySchema>;

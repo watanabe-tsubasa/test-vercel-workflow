@@ -1,17 +1,12 @@
 // steps/diarySteps.ts
 
-import { openai } from "@ai-sdk/openai";
-import { experimental_generateImage as generateImage } from "ai";
 import type {
 	UpdateDiaryInput,
 	UpdateDiaryResponse,
 } from "@/app/api/diary/update/route";
 import type { StreamDiaryInput } from "@/app/api/internal/ai/stream-start/route";
-import {
-	imageKitConfigured,
-	placeholderDiaryImage,
-	uploadDiaryImage,
-} from "@/lib/imagekitClient";
+import { placeholderDiaryImage, uploadDiaryImage } from "@/lib/imagekitClient";
+import { MODELS, openai } from "@/lib/openaiClient";
 import {
 	streamStartInWorkflow,
 	updateDiaryInWorkflow,
@@ -39,6 +34,30 @@ export async function stepStartStream(
 }
 
 // -------------------------
+// タイトル生成ステップ
+// -------------------------
+export async function stepGenerateDiaryTitle(input: {
+	workflowId: string;
+	prompt: string;
+}): Promise<string> {
+	"use step";
+
+	try {
+		const response = await openai.responses.create({
+			model: MODELS.text,
+			input: `次の日記の内容から、15文字以内の日本語タイトルを1つ作成してください。タイトル以外は返さないでください。\n${input.prompt}`,
+		});
+
+		const rawTitle = response.output_text?.trim() ?? "";
+		const firstLine = rawTitle.split(/\r?\n/)[0]?.trim();
+		return firstLine && firstLine.length > 0 ? firstLine : "日記";
+	} catch (err) {
+		console.error("Title generation error:", err);
+		return "日記";
+	}
+}
+
+// -------------------------
 // 画像生成＋ImageKitアップロードステップ
 // -------------------------
 export async function stepGenerateDiaryImage(input: {
@@ -46,45 +65,35 @@ export async function stepGenerateDiaryImage(input: {
 	prompt: string;
 }): Promise<{ imageUrl: string; hasImage: boolean }> {
 	"use step";
+
 	const { workflowId, prompt } = input;
-
 	const placeholder = placeholderDiaryImage(prompt);
-	let uploadSource = placeholder;
 
-	if (process.env.OPENAI_API_KEY) {
-		try {
-			const result = await generateImage({
-				model: openai.imageModel("gpt-image-1"),
-				prompt: `日記の内容に合うイラストを1枚生成してください: ${prompt}`,
-				size: "1024x1024",
-			});
-			// ai SDK returns base64 string
-			const base64Image =
-				(result as unknown as { image?: string; imageBase64?: string })
-					.imageBase64 || (result as unknown as { image?: string }).image;
-			if (typeof base64Image === "string") {
-				uploadSource = base64Image.replace(/^data:image\/\w+;base64,/, "");
-			}
-		} catch (err) {
-			console.error(
-				"Image generation failed, falling back to placeholder:",
-				err,
-			);
+	try {
+		const result = await openai.images.generate({
+			model: MODELS.image,
+			size: "1536x1024",
+			prompt: `日記の内容に合うイラストを1枚生成してください: ${prompt}`,
+		});
+
+		// OpenAI SDK の正式な返却形式
+		const base64Image = result.data?.[0]?.b64_json;
+
+		if (!base64Image) {
+			console.error("❌ base64 image not found in OpenAI response");
+			return { imageUrl: placeholder, hasImage: false };
 		}
-	}
 
-	if (imageKitConfigured()) {
-		try {
-			const upload = await uploadDiaryImage({
-				file: uploadSource,
-				fileName: `${workflowId}.png`,
-				folder: "/diaries",
-			});
-			return { imageUrl: upload.url, hasImage: true };
-		} catch (err) {
-			console.error("ImageKit upload failed, using placeholder:", err);
-		}
-	}
+		// ImageKit は純粋な base64 を必要とする
+		const upload = await uploadDiaryImage({
+			file: base64Image, // そのまま渡せる
+			fileName: `${workflowId}.png`,
+			folder: "/diaries",
+		});
 
-	return { imageUrl: placeholder, hasImage: false };
+		return { imageUrl: upload.url, hasImage: true };
+	} catch (err) {
+		console.error("Image generation or upload error:", err);
+		return { imageUrl: placeholder, hasImage: false };
+	}
 }

@@ -13,30 +13,37 @@ type Diary = {
 
 export async function DiaryContent({ diary }: { diary: Diary }) {
 	return (
-		<div className="mx-auto max-w-4xl space-y-6 h-full p-6 grid grid-cols-4 grid-rows-5">
-			{/* 画像エリア */}
-			{diary.hasImage && diary.imageUrl && (
-				<Card className="overflow-hidden col-span-2 col-start-2 row-span-2">
-					<ImageModal alt={diary.title} />
-				</Card>
-			)}
-
-			{/* 日記本文 */}
-			<Card className="p-6 col-span-5 row-span-3">
-				<div className="space-y-4 h-full flex flex-col">
-					<div className="flex items-center justify-between">
-						<h2 className="text-2xl font-bold text-foreground">
-							{diary.title}
-						</h2>
-						<span className="text-sm text-muted-foreground">{diary.date}</span>
-					</div>
-					<ScrollArea className="prose prose-sm max-w-none leading-relaxed text-foreground flex-1 overflow-auto">
-						{diary.content?.split(/\r?\n/).map((paragraph, idx) => (
-							<p key={`${idx}-${paragraph.slice(0, 20)}`}>{paragraph}</p>
-						))}
-					</ScrollArea>
+		<div className="mx-auto max-w-5xl space-y-6 h-full p-6">
+			<div className="flex items-start justify-between gap-3">
+				<div>
+					<h2 className="text-2xl font-bold text-foreground">{diary.title}</h2>
+					<span className="text-sm text-muted-foreground">{diary.date}</span>
 				</div>
-			</Card>
+			</div>
+
+			<div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
+				<Card className="p-6 h-full">
+					<ScrollArea className="prose prose-sm max-w-none leading-relaxed text-foreground h-full">
+						<div className="space-y-4">
+							{diary.content?.split(/\r?\n/).map((paragraph, idx) => (
+								<p key={`${idx}-${paragraph.slice(0, 20)}`}>{paragraph}</p>
+							))}
+						</div>
+					</ScrollArea>
+				</Card>
+
+				<Card className="p-4 h-full">
+					<div className="w-full">
+						{diary.hasImage && diary.imageUrl ? (
+							<ImageModal alt={diary.title} src={diary.imageUrl} />
+						) : (
+							<div className="aspect-3/2 flex items-center justify-center rounded-md border border-dashed text-sm text-muted-foreground">
+								画像はまだ生成されていません
+							</div>
+						)}
+					</div>
+				</Card>
+			</div>
 		</div>
 	);
 }

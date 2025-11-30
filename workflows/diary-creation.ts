@@ -1,5 +1,6 @@
 import {
 	stepGenerateDiaryImage,
+	stepGenerateDiaryTitle,
 	stepStartStream,
 	stepUpdateDiary,
 } from "@/steps/diarySteps";
@@ -53,17 +54,25 @@ export const diaryWorkflow = async (params: {
 	});
 
 	// 状態4️⃣: 絵を生成して保存
+	// 状態4️⃣-2: revisedBulletsからタイトルを生成して保存。フロントに反映
 	console.log("[workflow] generating image", { workflowId });
-	const { imageUrl, hasImage } = await stepGenerateDiaryImage({
-		workflowId,
-		prompt: revisedBullets,
-	});
+	const [imageResult, title] = await Promise.all([
+		stepGenerateDiaryImage({
+			workflowId,
+			prompt: revisedBullets,
+		}),
+		stepGenerateDiaryTitle({
+			workflowId,
+			prompt: revisedBullets,
+		}),
+	]);
 
 	// 状態5️⃣: DBへ保存 → 完了
 	const res = await stepUpdateDiary({
 		workflowId,
-		imageUrl,
-		hasImage,
+		imageUrl: imageResult.imageUrl,
+		hasImage: imageResult.hasImage,
+		title,
 		state: "COMPLETED",
 	});
 

@@ -10,6 +10,9 @@ type Diaries = Array<{
 	title: string;
 	date: string;
 	hasImage: boolean;
+	state?: string;
+	workflowId?: string | null;
+	content?: string | null;
 }>;
 
 export async function getDiaries(): Promise<Diaries> {
@@ -49,6 +52,32 @@ export async function getDiaries(): Promise<Diaries> {
 			},
 		];
 	}
+
+	return diaries.map((d) => ({
+		...d,
+		date: d.date.toLocaleDateString("ja-JP", {
+			year: "numeric",
+			month: "2-digit",
+			day: "2-digit",
+		}),
+	}));
+}
+
+export async function getInProgressDiaries(): Promise<Diaries> {
+	const { id: currentUserId } = await requireCurrentUser();
+	const diaries = await prisma.diary.findMany({
+		where: { userId: currentUserId, NOT: { state: "COMPLETED" } },
+		select: {
+			id: true,
+			title: true,
+			date: true,
+			hasImage: true,
+			state: true,
+			workflowId: true,
+			content: true,
+		},
+		orderBy: { updatedAt: "desc" },
+	});
 
 	return diaries.map((d) => ({
 		...d,

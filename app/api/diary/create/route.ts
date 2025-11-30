@@ -46,9 +46,9 @@ export async function POST(request: Request) {
 
 		await prisma.diary.create({
 			data: {
-				title: "test",
+				title: "",
 				date,
-				content: "test",
+				content: bullet,
 				hasImage: false,
 				state: DiaryState.DRAFT,
 				userId: user.id,

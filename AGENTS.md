@@ -1,5 +1,9 @@
 # Repository Guidelines
 
+- 開発速度を上げるために一通りの作業をした後で、`bun run build`でビルドが通ることを確認
+- lintはこちらが指定したタイミングで実施（`bun run lint` && `bun run format`）
+- pythonでのファイル更新は実施しない
+
 ## Project Structure & Module Organization
 - `app/`: Next.js App Router pages, layouts, and API routes (`app/api/**/route.ts`).
 - `components/`: Reusable React components (`*.tsx`).
