@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI-Powered Diary Workflow App
 
-## Getting Started
+Next.js (App Router) app that turns bullet points into illustrated diaries. Google sign-in gates access, OpenAI generates the draft and image, ImageKit hosts the artwork, and a Vercel Workflow orchestrates the steps end-to-end.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Google OAuth login with NextAuth; diaries are scoped per user
+- Diary creation flow: stream AI draft → user revision → OpenAI image generation → ImageKit upload
+- Workflow status polling and SSE draft streaming for responsive UX
+- Dashboard of your diaries with state badges, detail view with stored ImageKit URL
+- Drizzle ORM + Neon (PostgreSQL) schema for `User`/`Diary`
+
+## Tech Stack
+
+- Next.js 16 / React 19 (App Router, Server Actions)
+- Drizzle ORM on Neon serverless Postgres
+- NextAuth (Google provider, JWT session)
+- OpenAI (text + image) via AI SDK, ImageKit for storage/CDN
+- Workflow runtime (`workflows/`, `steps/`) to coordinate diary generation
+- Biome for lint/format
+
+## Prerequisites
+
+- Node.js 18+ (Bun or npm available)
+- PostgreSQL connection string (Neon recommended)
+- OpenAI API key, ImageKit credentials, Google OAuth client/secret
+
+## Environment Variables
+
+Create `.env.local` with at least:
+
+```.env
+DATABASE_URL=postgres://user:pass@host:5432/db
+WORKFLOW_BASE_URL=http://localhost:3000
+OPENAI_API_KEY=sk-***
+IMAGEKIT_PUBLIC_KEY=***
+IMAGEKIT_PRIVATE_KEY=***
+IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_space
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=dev-secret
+GOOGLE_CLIENT_ID=***
+GOOGLE_CLIENT_SECRET=***
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup & Commands
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Install dependencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```sh
+bun install
+# or: npm install
+```
 
-## Learn More
+Create schema on your Postgres instance:
 
-To learn more about Next.js, take a look at the following resources:
+```sh
+bun run db:push
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Run the app locally:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```sh
+bun run dev
+# open http://localhost:3000
+```
 
-## Deploy on Vercel
+Build for production (run after changes to verify):
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```sh
+bun run build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Lint/format when needed:
+
+```sh
+bun run lint
+bun run format
+```
+
+## Workflow & API Notes
+
+- New diary: `/creation` starts a workflow (`/api/diary/create`) that streams a draft (`/api/internal/ai/stream-start`), waits for user revision (`/api/diary/revise`), then generates title/image and persists via `/api/diary/update`.
+- Workflow status is polled from `/api/workflow/status` using the `workflowId`.
+- Auth is enforced server-side (`requireCurrentUser`); unauthenticated users are redirected to `/login`.
+
+## Project Structure
+
+- `app/` — App Router pages (dashboard, creation flow, diary detail, auth) and API routes
+- `components/` — Reusable UI (sidebar, inputs, cards)
+- `db/` — Drizzle schema for User/Diary
+- `lib/` — Auth, DB, OpenAI, ImageKit, workflow client helpers
+- `workflows/` & `steps/` — Workflow definitions and step functions
+- `public/` — Static assets
