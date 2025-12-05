@@ -4,7 +4,7 @@ import {
 	stepStartStream,
 	stepUpdateDiary,
 } from "@/steps/diarySteps";
-import { userEditedHook } from "@/workflows/hook";
+import { userEditedHookClient } from "@/workflows/hook-client";
 
 /**
  * Diary作成用のWorkflow
@@ -21,7 +21,7 @@ export const diaryWorkflow = async (params: {
 	const { workflowId, bullets, userId } = params;
 
 	// hook は workflow コンテキストで生成する
-	const userEditedPromise = userEditedHook.create({ token: workflowId });
+	const userEditedPromise = userEditedHookClient.create({ token: workflowId });
 
 	// 状態1️⃣: 箇条書き受信 → DRAFTに登録
 	console.log("[workflow] start diary", { workflowId, userId });

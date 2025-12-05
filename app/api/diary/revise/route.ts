@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import z from "zod";
-import { userEditedHookClient } from "../../../../workflows/hook-client";
+import { userEditedHookClient } from "@/workflows/hook-client";
 
 const RevisePostBodySchema = z.object({
 	workflowId: z.string(),
